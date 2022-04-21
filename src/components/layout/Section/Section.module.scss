@@ -1,0 +1,10 @@
+@import "../../../index.scss";
+.section {
+  background-color: $color__green;
+  &Title {
+    color: $color__red;
+  }
+  &Content {
+    color: $color__golden;
+  }
+}

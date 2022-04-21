@@ -1,22 +1,20 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import { CleanWebpackPlugin } from "clean-webpack-plugin";
-// import nodeExternals from "webpack-node-externals";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-
+import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// const isDevelopment = process.env.ENV === "dev";
-const isDevelopment = true;
 
-console.log({ process: process.env.ENV });
 export default {
-  entry: "./src/index.js",
-  // externals: [nodeExternals()], //Note: This turns files to CJS. Take care of it later
+  entry: {
+    main: "./src/index.js",
+    "UI/Button/index.js": "./src/components/ui/Button/index.jsx",
+    "Layout/Section/index.js": "./src/components/layout/Section/index.jsx",
+  },
   //Exports ES Modules
   output: {
-    filename: "index.js",
-    path: path.resolve(__dirname, "dist/esm"),
-    // libraryTarget: "esm",
+    filename: "[name].js",
+    path: path.resolve(__dirname, "dist/components"),
     library: {
       type: "module",
     },
@@ -24,32 +22,23 @@ export default {
   experiments: {
     outputModule: true,
   },
-  //Exports commonjs
-  // output: {
-  //   filename: "index.js",
-  //   path: path.resolve(__dirname, "dist/cjs"),
-  //   libraryTarget: "commonjs",
-  // },
+  mode: "production",
+  optimization: {
+    usedExports: true,
+    sideEffects: true,
+    innerGraph: true,
+  },
 
   plugins: [
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: isDevelopment ? "[name].css" : "[name].[hash].css",
-      chunkFilename: isDevelopment ? "[id].css" : "[id].[hash].css",
+      filename: "[name].[hash].css",
+      chunkFilename: "[id].[hash].css",
     }),
+    // new BundleAnalyzerPlugin(),
   ],
   module: {
     rules: [
-      // {
-      //   test: /\.(js|jsx)$/,
-      //   exclude: /node_modules/,
-      //   use: ["babel-loader"],
-      // },
-      // {
-      //   test: /\.scss$/,
-      //   use: ["style-loader", "css-loader", "sass-loader"],
-      //   include: path.resolve(__dirname, "./src"),
-      // },
       {
         //Processes JSX and for some getting cannot process scss error NOTE: To be debugged later
         test: /\.jsx/,
@@ -61,24 +50,24 @@ export default {
           },
         },
       },
-      //This supports SCSS Modules. How does it word :
+      //This supports SCSS Modules. How does it work :
       //Rule immediately below this applies on filename.module.scss. First SASS is converted to CSS using 'sass-loader' plugin, then that code is ran through css-loader to process SCSS specific keywords like '@import()', 'url()'. Then it is appended to DOM using style-loader or if in production using CSS Extract plugin
       {
         test: /\.module\.scss$/,
         include: path.resolve(__dirname, "./src"),
         use: [
-          isDevelopment ? "style-loader" : MiniCssExtractPlugin.loader,
+          "style-loader",
           {
             loader: "css-loader",
             options: {
               modules: true,
-              sourceMap: isDevelopment,
+              sourceMap: true,
             },
           },
           {
             loader: "sass-loader",
             options: {
-              sourceMap: isDevelopment,
+              sourceMap: true,
             },
           },
         ],
@@ -89,12 +78,12 @@ export default {
         include: path.resolve(__dirname, "./src"),
         exclude: /\.module.(scss)$/,
         use: [
-          isDevelopment ? "style-loader" : MiniCssExtractPlugin.loader,
+          "style-loader",
           "css-loader",
           {
             loader: "sass-loader",
             options: {
-              sourceMap: isDevelopment,
+              sourceMap: true,
             },
           },
         ],
