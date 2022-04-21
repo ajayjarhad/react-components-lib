@@ -8,8 +8,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default {
   entry: {
     main: "./src/index.js",
-    "UI/Button/index.js": "./src/components/ui/Button/index.jsx",
-    "Layout/Section/index.js": "./src/components/layout/Section/index.jsx",
+    "UI/Button/index": "./src/components/ui/Button/index.jsx",
+    "Layout/Section/index": "./src/components/layout/Section/index.jsx",
   },
   //Exports ES Modules
   output: {
